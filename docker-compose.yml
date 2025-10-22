@@ -10,21 +10,26 @@ services:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      - jenkins_home:/var/jenkins_home
+      - jenkins-data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
-      - workspace:/workspace
+      - ../simple-django-app-taller2:/workspace # ← Montar el código
+    networks:
+      - devopsnet
 
-  web:
-    build:
-      context: ./web
-      dockerfile: Dockerfile
-    container_name: django_app
+  app:
+    build: ./app
+    container_name: django-app
     restart: on-failure
     ports:
       - "8000:8000"
-    volumes:
-      - workspace:/app
+    depends_on:
+      - jenkins
+    networks:
+      - devopsnet
 
 volumes:
-  jenkins_home:
-  workspace:
+  jenkins-data:
+
+networks:
+  devopsnet:
+    driver: bridge
