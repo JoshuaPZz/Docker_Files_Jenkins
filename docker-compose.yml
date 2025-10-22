@@ -4,27 +4,25 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
-    restart: on-failure
+    user: root
+    restart: always # Jenkins siempre corriendo
     ports:
       - "8080:8080"
-      - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./web:/workspace # Para acceder al código
 
-  web:
+  django_app:
     build:
       context: ./web
       dockerfile: Dockerfile
     container_name: django_app
-    restart: on-failure
+    restart: on-failure # Django se reinicia cuando el pipeline lo reconstruye
     ports:
       - "8000:8000"
     volumes:
       - ./web:/app
-    command: >
-      sh -c "python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:8000"
 
 volumes:
   jenkins_home:
