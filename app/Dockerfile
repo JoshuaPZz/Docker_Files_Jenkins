@@ -1,11 +1,11 @@
-FROM python:3.10
+FROM jenkins/jenkins:lts-jdk17
 
-WORKDIR /app
-COPY . .
-RUN apt-get update && apt-get install -y \
-    gcc \
-    postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+# No utilizar en un ambiente de producción
+ENV JENKINS_USER=admin
+ENV JENKINS_PASS=admin
+ENV JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
-EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+USER root
+RUN apt-get update && apt-get install -y docker.io python3 python3-pip python3-django pylint && apt-get clean
+
+USER jenkins
